@@ -1,15 +1,29 @@
+import Cookies from "cookies";
 import { GetServerSideProps } from "next";
-import { login } from "../services/AuthenticationService";
-import { transpileCookie } from "../services/CookieService";
-import { CookieKeys } from "../utils/Constants";
+import { addOrRenewAuthentication } from "../services/AuthenticationService";
+import { getAuthentication } from "../services/CookieService";
+import { addUser } from "../services/UserService";
 
 const Home = () => {
-	return <h1>Test</h1>;
+	return <h1>Hello World!!!</h1>;
 };
 
-export const getServerSideProps: GetServerSideProps = async context => {
-	const cookieObj = transpileCookie(context.req.headers.cookie);
-	console.log(cookieObj);
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+	addUser({
+		username: "Tri Che",
+		password: "kms123"
+	});
+	const cookies = new Cookies(req, res);
+	const authentication = getAuthentication(cookies);
+	if (!authentication) {
+		return {
+			props: {
+				authenticated: false
+			}
+		};
+	} else {
+		addOrRenewAuthentication(authentication.username, authentication.authenticationId);
+	}
 
 	return {
 		props: {}
