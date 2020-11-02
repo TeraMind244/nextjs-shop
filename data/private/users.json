@@ -1,8 +1,6 @@
-{
-	"users": [
-		{
-			"username": "triche",
-			"password": "kms123"
-		}
-	]
-}
+[
+	{
+		"username": "triche",
+		"password": "$2b$10$FFl3BKaFsNyjQ.fIKSX9ye9QH.tAJsTFOdCOuSroR6PbNgGysjeGm"
+	}
+]

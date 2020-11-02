@@ -1,22 +1,23 @@
+import Cookies, { Cookie } from "cookies";
 import { IAuthentication } from "../interfaces/Authentication";
+import { CookieKeys } from "../utils/Constants";
 
-type CookieType = {
-	[key: string]: string;
+export const getAuthentication = (cookie: Cookies): IAuthentication | null => {
+	const username = cookie.get(CookieKeys.USERNAME);
+	const authenticationId = cookie.get(CookieKeys.AUTHENTICATION_ID);
+	const authenticationTime = parseInt(cookie.get(CookieKeys.AUTHENTICATION_TIME));
+
+	if (!authenticationId) {
+		return null;
+	}
+
+	return {
+		username,
+		authenticationId,
+		authenticationTime
+	};
 };
 
-export const getAuthentication = (cookie: CookieType): IAuthentication | null => {
-	return null;
-};
-
-export const transpileCookie = (cookie: string): CookieType => {
-	if (!cookie) {
-		return {};
-	}
-	const pairs = cookie.split(";").map(value => value.trim());
-	const cookieObject: CookieType = {};
-	for (const pair of pairs) {
-		const [key, value] = pair.split("=");
-		cookieObject[key] = value;
-	}
-	return cookieObject;
+export const removeExpiredAuthentication = (cookie: Cookies): void => {
+	[CookieKeys.USERNAME, CookieKeys.AUTHENTICATION_ID, CookieKeys.AUTHENTICATION_TIME].forEach(key => cookie.set(key));
 };

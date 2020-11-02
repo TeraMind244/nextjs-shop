@@ -10,16 +10,18 @@ const Home = () => {
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	addUser({
-		username: "Tri Che",
+		username: "triche",
 		password: "kms123"
 	});
 	const cookies = new Cookies(req, res);
 	const authentication = getAuthentication(cookies);
+
 	if (!authentication) {
 		return {
 			props: {
 				authenticated: false
-			}
+			},
+			redirect: "/login"
 		};
 	} else {
 		addOrRenewAuthentication(authentication.username, authentication.authenticationId);
