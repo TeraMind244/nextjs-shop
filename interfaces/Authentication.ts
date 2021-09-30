@@ -1,5 +1,6 @@
 export interface IAuthentication {
-	username: string;
-	authenticationId: string;
-	authenticationTime: number;
+	[username: string]: {
+		authenticationId: string;
+		authenticationTime: number;
+	};
 }

@@ -1,34 +1,47 @@
-import Cookies from "cookies";
-import { GetServerSideProps } from "next";
-import { addOrRenewAuthentication } from "../services/AuthenticationService";
-import { getAuthentication } from "../services/CookieService";
+import { GetServerSideProps, NextPage } from "next";
+import Shop from "../components/Shop";
+import { loginWithAuthenticationId } from "../services/AuthenticationService";
 import { addUser } from "../services/UserService";
+import { getAuthentication } from "../utils/CookieHelper";
 
-const Home = () => {
-	return <h1>Hello World!!!</h1>;
+interface IProps {
+	username: string;
+}
+
+const Home: NextPage<IProps> = ({ username }) => {
+	return (
+		<>
+			<h1>Hello {username}</h1>
+			<Shop products={[]}></Shop>
+		</>
+	);
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-	addUser({
+export const getServerSideProps: GetServerSideProps<IProps> = async ({ req, res }) => {
+	await addUser({
 		username: "triche",
 		password: "kms123"
 	});
-	const cookies = new Cookies(req, res);
-	const authentication = getAuthentication(cookies);
 
-	if (!authentication) {
-		return {
-			props: {
-				authenticated: false
-			},
-			redirect: "/login"
-		};
-	} else {
-		addOrRenewAuthentication(authentication.username, authentication.authenticationId);
+	const authentication = await getAuthentication(req.headers.cookie);
+	if (authentication) {
+		const { username, authenticationId } = authentication;
+
+		const loginSuccess = await loginWithAuthenticationId(username, authenticationId);
+		if (loginSuccess) {
+			return {
+				props: {
+					username
+				}
+			};
+		}
 	}
 
 	return {
-		props: {}
+		redirect: {
+			destination: "/login",
+			permanent: false
+		}
 	};
 };
 

@@ -11,23 +11,31 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "node ./scripts/prepare-data && next build",
-		"start": "next start"
+		"start": "next start",
+		"crawler": "ts-node --project ./server/tsconfig.json ./server/crawler/Crawler"
 	},
 	"dependencies": {
+		"@apollo/client": "3.3.6",
+		"axios": "0.21.1",
 		"bcrypt": "5.0.0",
-		"cookies": "0.7.3",
 		"fs-extra": "9.0.1",
-		"next": "^10.0.0",
-		"react": "16.13.1",
-		"react-dom": "16.13.1"
+		"graphql": "15.4.0",
+		"mongodb": "3.6.3",
+		"next": "10.0.4",
+		"node-fetch": "2.6.1",
+		"react": "17.0.1",
+		"react-dom": "17.0.1",
+		"reflect-metadata": "0.1.13",
+		"typeorm": "0.2.29"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "3.0.0",
-		"@types/cookies": "0.7.5",
 		"@types/fs-extra": "9.0.2",
-		"@types/node": "^14.14.6",
-		"@types/react": "^16.9.55",
+		"@types/node": "14.14.19",
+		"@types/node-fetch": "2.5.7",
+		"@types/react": "17.0.0",
 		"prettier": "2.1.2",
+		"ts-node": "9.1.1",
 		"typescript": "4.0.5"
 	}
 }

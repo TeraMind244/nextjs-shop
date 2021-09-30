@@ -3,16 +3,16 @@ import { DataPath } from "../utils/Constants";
 import { encrypt } from "./EncryptionService";
 import { getDataFromJSON, writeDataToJSON } from "./FileService";
 
-export const getAllUsers = (): IUser[] => {
-	return getDataFromJSON(DataPath.USERS) as IUser[];
+export const getAllUsers = async (): Promise<IUser[]> => {
+	return await getDataFromJSON<IUser[]>(DataPath.USERS);
 };
 
-export const addUser = ({username, password}: IUser): void => {
-	const allUsers = getAllUsers();
+export const addUser = async ({username, password}: IUser): Promise<void> => {
+	const allUsers = await getAllUsers();
 	if (allUsers.find(user => user.username === username)) {
 		return;
 	}
-	writeDataToJSON(DataPath.USERS, [
+	writeDataToJSON<IUser[]>(DataPath.USERS, [
 		...allUsers,
 		{
 			username,

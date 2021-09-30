@@ -7,6 +7,6 @@ export enum CookieKeys {
 
 export enum DataPath {
 	USERS = "private/users.json",
-	AUTHENTICATION = "private/authentication.json",
+	AUTHENTICATION = "private/authentications.json",
 	SHOP = "public/shop.json"
 }

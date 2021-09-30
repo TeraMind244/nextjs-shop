@@ -1,41 +1,45 @@
+import { EXPIRED_DURATION } from "../constants/Constants";
+import { IAuthentication } from "../interfaces/Authentication";
 import { IUser } from "../interfaces/User";
 import { DataPath } from "../utils/Constants";
 import { uuid } from "../utils/Utils";
-import { encrypt, isPasswordMatched } from "./EncryptionService";
+import { isPasswordMatched } from "./EncryptionService";
 import { getDataFromJSON, writeDataToJSON } from "./FileService";
 import { getAllUsers } from "./UserService";
 
-const expiredDuration /* One day */ = 24 * 3600 * 1000;
-
-export const login = ({ username, password }: IUser): boolean => {
-	const matchedUser = getAllUsers().find(user => user.username === username);
+export const login = async ({ username, password }: IUser): Promise<string> => {
+	const matchedUser = (await getAllUsers()).find(user => user.username === username);
 	const loginSucess = isPasswordMatched(password, matchedUser.password);
 	if (loginSucess) {
-		addOrRenewAuthentication(username, uuid());
+		const authenticationId = uuid()
+		addOrRenewAuthentication(username, authenticationId);
+		return authenticationId;
 	}
-	return loginSucess;
+	return "";
 };
 
-export const addOrRenewAuthentication = (username: string, authenticationId: string): void => {
-	const authenticationEntries = getAllAuthenticationEntries();
+export const loginWithAuthenticationId = async (username: string, authenticationId: string): Promise<boolean> => {
+	const allAuthenticationEntries = await getAllAuthenticationEntries();
+	console.log(allAuthenticationEntries);
+
+	const loginSuccess = allAuthenticationEntries[username]?.authenticationId === authenticationId;
+	if (loginSuccess) {
+		await addOrRenewAuthentication(username, authenticationId);
+	}
+	return loginSuccess;
+}
+
+const addOrRenewAuthentication = async (username: string, authenticationId: string): Promise<void> => {
+	const authenticationEntries = await getAllAuthenticationEntries();
 	authenticationEntries[username] = {
 		authenticationId,
 		authenticationTime: Date.now()
 	};
-	writeDataToJSON(DataPath.AUTHENTICATION, authenticationEntries);
+	writeDataToJSON<IAuthentication>(DataPath.AUTHENTICATION, authenticationEntries);
 };
 
-const getAllAuthenticationEntries = () => {
-	const allAuthenticationEntries = getDataFromJSON(DataPath.AUTHENTICATION);
-	const newAuthenticationEntries = [];
-	Object.keys(allAuthenticationEntries).forEach(username => {
-		if (!isAuthenticationExpired(parseInt(allAuthenticationEntries[username].authenticationTime))) {
-			newAuthenticationEntries[username] = {
-				...allAuthenticationEntries[username]
-			};
-		}
-	});
-	return newAuthenticationEntries;
+const getAllAuthenticationEntries = async (): Promise<IAuthentication> => {
+	return await getDataFromJSON<IAuthentication>(DataPath.AUTHENTICATION);
 };
 
-export const isAuthenticationExpired = (saved: number): boolean => Date.now() - saved > expiredDuration;
+export const isAuthenticationExpired = (saved: number): boolean => Date.now() - saved > EXPIRED_DURATION;
